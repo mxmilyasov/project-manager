@@ -3,48 +3,74 @@
 
 namespace App\Model\User\Entity\User;
 
+use DateTimeImmutable;
 
 class User
 {
+    private const STATUS_WAIT = 'wait';
+    private const STATUS_ACTIVE = 'active';
+
+    /**
+     * @var Id
+     */
+    private Id $id;
+
+    /**
+     * @var DateTimeImmutable
+     */
+    private DateTimeImmutable $date;
+
+    /**
+     * @var Email
+     */
+    private Email $email;
+
     /**
      * @var string
      */
-    private $id;
+    private string $passwordHash;
 
     /**
-     * @var \DateTimeImmutable
+     * @var string|null
      */
-    private $date;
-
-    /**
-     * @var string
-     */
-    private $email;
+    private string $confirmToken;
 
     /**
      * @var string
      */
-    private $passwordHash;
+    private string $status;
 
-    public function __construct(string $id, \DateTimeImmutable $date, string $email, string $hash)
+    public function __construct(Id $id, DateTimeImmutable $date, Email $email, string $hash, string $token)
     {
         $this->id = $id;
         $this->date = $date;
         $this->email = $email;
         $this->passwordHash = $hash;
+        $this->confirmToken = $token;
+        $this->status = self::STATUS_WAIT;
     }
 
-    public function getId(): string
+    public function isWait(): bool
+    {
+        return $this->status === self::STATUS_WAIT;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function getId(): Id
     {
         return $this->id;
     }
 
-    public function getDate(): \DateTimeImmutable
+    public function getDate(): DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function getEmail(): string
+    public function getEmail(): Email
     {
         return $this->email;
     }
@@ -52,5 +78,10 @@ class User
     public function getPasswordHash(): string
     {
         return $this->passwordHash;
+    }
+
+    public function getConfirmToken(): string
+    {
+        return $this->confirmToken;
     }
 }

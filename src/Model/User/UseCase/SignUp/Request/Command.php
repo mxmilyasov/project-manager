@@ -3,16 +3,17 @@
 
 namespace App\Model\User\UseCase\SignUp\Request;
 
+use App\Model\User\Entity\User\Email;
 
 class Command
 {
     /**
-     * @var string
+     * @var Email
      */
-    public $email;
+    public Email $email;
 
     /**
      * @var string
      */
-    public $password;
+    public string $password;
 }

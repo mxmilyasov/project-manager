@@ -1,5 +1,5 @@
 up: docker-up
-init: docker-down docker-pull docker-build docker-up manager-init
+init: docker-down-clear docker-pull docker-build docker-up manager-init
 down: docker-down
 test: manager-test
 
@@ -8,6 +8,9 @@ docker-up:
 
 docker-down:
 	docker-compose down --remove-orphans
+
+docker-down-clear:
+	docker-compose down -v --remove-orphans
 
 docker-pull:
 	docker-compose pull
@@ -41,5 +44,7 @@ deploy-production:
 	scp -o StrictHostKeyChecking=no -P ${PRODUCTION_PORT} docker-compose-production.yml ${PRODUCTION_HOST}:docker-compose.yml
 	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'echo "REGISTRY_ADDRESS=${REGISTRY_ADDRESS}" >> .env'
 	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'echo "IMAGE_TAG=${IMAGE_TAG}" >> .env'
+	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'echo "MANAGER_APP_SECRET=${MANAGER_APP_SECRET}" >> .env'
+	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'echo "MANAGER_DP_PASSWORD=${MANAGER_DP_PASSWORD}" >> .env'
 	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'docker-compose pull'
 	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'docker-compose --build -d'

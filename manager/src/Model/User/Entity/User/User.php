@@ -71,7 +71,7 @@ class User
         if (!$this->isNew()) {
             throw new \DomainException('User is already signed up.');
         }
-        $this->networks->add(new Network($this, $network, $identity));
+        $this->attachNetwork($network, $identity);
         $this->status = self::STATUS_ACTIVE;
     }
 

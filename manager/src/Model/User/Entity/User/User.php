@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\User\Entity\User;
 
+use App\Model\User\Service\PasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class User
@@ -92,6 +93,9 @@ class User
 
     public function requestPasswordReset(ResetToken $token, \DateTimeImmutable $date): void
     {
+        if (!$this->isActive()) {
+            throw new \DomainException('User is not active.');
+        }
         if (!$this->email) {
             throw new \DomainException('Email is not specified.');
         }

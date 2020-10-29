@@ -13,12 +13,9 @@ class AuthTest extends TestCase
 {
     public function testSuccess(): void
     {
-        $user = new User(
+        $user = User::signUpByNetwork(
             Id::next(),
-            new \DateTimeImmutable()
-        );
-
-        $user->signUpByNetwork(
+            new \DateTimeImmutable(),
             $network = 'vk',
             $identity = '000001'
         );
@@ -30,19 +27,16 @@ class AuthTest extends TestCase
         self::assertEquals($identity, $first->getIdentity());
     }
 
-    public function testAlready(): void
-    {
-        $user = new User(
-            Id::next(),
-            new \DateTimeImmutable()
-        );
-
-        $user->signUpByNetwork(
-            $network = 'vk',
-            $identity = '000001'
-        );
-
-        $this->expectExceptionMessage('User is already signed up.');
-        $user->signUpByNetwork($network, $identity);
-    }
+//    public function testAlready(): void
+//    {
+//        $user = User::signUpByNetwork(
+//            $id = Id::next(),
+//            $date = new \DateTimeImmutable(),
+//            $network = 'vk',
+//            $identity = '000001'
+//        );
+//
+//        $this->expectExceptionMessage('User is already signed up.');
+//        $user->signUpByNetwork($id, $date, $network, $identity);
+//    }
 }

@@ -53,32 +53,38 @@ class User
      */
     private $resetToken;
 
-    public function __construct(Id $id, \DateTimeImmutable $date)
+    private function __construct(Id $id, \DateTimeImmutable $date)
     {
         $this->id = $id;
         $this->date = $date;
-        $this->status = self::STATUS_NEW;
         $this->networks = new ArrayCollection();
     }
 
-    public function signUpByEmail(Email $email, string $hash, string $token): void
+    public static function signUpByEmail(Id $id, \DateTimeImmutable $date, Email $email, string $hash, string $token): self
     {
-        if (!$this->isNew()) {
-            throw new \DomainException('User us already signed up.');
-        }
-        $this->email = $email;
-        $this->passwordHash = $hash;
-        $this->confirmToken = $token;
-        $this->status = self::STATUS_WAIT;
+        $user = new self($id, $date);
+        $user->email = $email;
+        $user->passwordHash = $hash;
+        $user->confirmToken = $token;
+        $user->status = self::STATUS_WAIT;
+        return $user;
     }
 
-    public function signUpByNetwork(string $network, string $identity): void
+    public function confirmSignUp(): void
     {
-        if (!$this->isNew()) {
-            throw new \DomainException('User is already signed up.');
+        if (!$this->isWait()) {
+            throw new \DomainException('User is already confirmed.');
         }
-        $this->attachNetwork($network, $identity);
         $this->status = self::STATUS_ACTIVE;
+        $this->confirmToken = null;
+    }
+
+    public static function signUpByNetwork(Id $id, \DateTimeImmutable $date, string $network, string $identity): self
+    {
+        $user = new self($id, $date);
+        $user->attachNetwork($network, $identity);
+        $user->status = self::STATUS_ACTIVE;
+        return $user;
     }
 
     public function attachNetwork(string $network, string $identity): void
@@ -114,16 +120,6 @@ class User
             throw new \DomainException('Reset token is expired.');
         }
         $this->passwordHash = $hash;
-    }
-
-    public function confirmSignUp(): void
-    {
-        if (!$this->isWait()) {
-            throw new \DomainException('User is already confirmed.');
-        }
-
-        $this->status = self::STATUS_ACTIVE;
-        $this->confirmToken = null;
     }
 
     public function isWait(): bool

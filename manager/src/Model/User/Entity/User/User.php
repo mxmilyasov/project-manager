@@ -6,6 +6,7 @@ namespace App\Model\User\Entity\User;
 
 use App\Model\User\Service\PasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
+use Zend\EventManager\Exception\DomainException;
 
 class User
 {
@@ -31,6 +32,11 @@ class User
     /**
      * @var string
      */
+    private $status;
+
+    /**
+     * @var string
+     */
     private $passwordHash;
 
     /**
@@ -39,24 +45,25 @@ class User
     private $confirmToken;
 
     /**
-     * @var string
+     * @var ResetToken|null
      */
-    private $status;
+    private $resetToken;
+
+    /**
+     * @var Role
+     */
+    private $role;
 
     /**
      * @var Network[]|ArrayCollection
      */
     private $networks;
 
-    /**
-     * @var ResetToken|null
-     */
-    private $resetToken;
-
     private function __construct(Id $id, \DateTimeImmutable $date)
     {
         $this->id = $id;
         $this->date = $date;
+        $this->role = Role::user();
         $this->networks = new ArrayCollection();
     }
 
@@ -122,6 +129,14 @@ class User
         $this->passwordHash = $hash;
     }
 
+    public function changeRole(Role $role)
+    {
+        if ($this->role->isEqual($role)) {
+            throw new \DomainException('Role is already same.');
+        }
+        $this->role = $role;
+    }
+
     public function isWait(): bool
     {
         return $this->status === self::STATUS_WAIT;
@@ -130,6 +145,11 @@ class User
     public function isActive(): bool
     {
         return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function getRole()
+    {
+        return $this->role;
     }
 
     private function isNew(): bool

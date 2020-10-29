@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Model\User\Entity\User;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\GuidType;
 
-class IdType extends StringType
+class IdType extends GuidType
 {
     public const NAME = 'user_user_id';
 
